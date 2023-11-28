@@ -1,32 +1,33 @@
+const express = require('express');
+
 const { check } = require('express-validator');
 
-const { validMark } = require('../middlewares');
+const { validRequest } = require('../middlewares');
 const HandlersMark = require('./http-mark-handlers');
 
 module.exports = class ConfigureRouterMark {
-    constructor(express, markUseCases) {
-        this.express = express;
+    constructor(markUseCases) {
         this.markUseCases = markUseCases;
         this.router = null;
     }
 
     setRouter() {
-        this.router = this.express.Router();
+        this.router = express.Router();
         const markHandlers = new HandlersMark(
             this.markUseCases,
         );
         this.router.get(
-            '/marks/',
+            '/',
             markHandlers.getMarkHandler,
         );
 
         this.router.post(
-            '/marks/',
+            '/',
             markHandlers.postMarkHandler,
         );
 
         this.router.put(
-            '/marks/:id/',
+            '/:id/',
             [
                 check('id', 'id is required').not().isEmpty(),
                 check('id').custom(async (id) => {
@@ -35,13 +36,13 @@ module.exports = class ConfigureRouterMark {
                     );
                     if (!mark) throw new Error(`this mark id ${id}, not exists...`);
                 }),
-                validMark,
+                validRequest,
             ],
             markHandlers.putMarkHandler,
         );
 
         this.router.delete(
-            '/marks/:id/',
+            '/:id/',
             [
                 check('id', 'id is required').not().isEmpty(),
                 check('id').custom(async (id) => {
@@ -50,7 +51,7 @@ module.exports = class ConfigureRouterMark {
                     );
                     if (!mark) throw new Error(`this mark id ${id}, not exists...`);
                 }),
-                validMark,
+                validRequest,
             ],
             markHandlers.deleteMarkHandler,
         );

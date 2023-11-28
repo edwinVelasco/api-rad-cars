@@ -1,5 +1,3 @@
-const express = require('express');
-
 const env = require('./infraestructure/dotenv/envs');
 
 const Server = require('./infraestructure/express/express-server');
@@ -46,11 +44,10 @@ const UseCasesModel = require('./application/usecases/usecases-model');
     );
     const useCasesProvider = new UseCasesProvider(postgresRepositoryProvider);
     const configureProviderRouter = new ConfigureRouterProvider(
-        express,
         useCasesProvider,
     );
     const routerProvider = configureProviderRouter.setRouter();
-    server.addRouter('/api/v1', routerProvider);
+    server.addRouter('/api/v1/providers', routerProvider);
 
     // marks
     const postgresRepositoryMark = new PostgresRepositoryMark(
@@ -58,11 +55,10 @@ const UseCasesModel = require('./application/usecases/usecases-model');
     );
     const useCasesMark = new UseCasesMark(postgresRepositoryMark);
     const configureMarkRouter = new ConfigureRouterMark(
-        express,
         useCasesMark,
     );
     const routerMark = configureMarkRouter.setRouter();
-    server.addRouter('/api/v1', routerMark);
+    server.addRouter('/api/v1/marks', routerMark);
 
     // models
     const postgresRepositoryModel = new PostgresRepositoryModel(
@@ -70,11 +66,10 @@ const UseCasesModel = require('./application/usecases/usecases-model');
     );
     const useCasesModel = new UseCasesModel(postgresRepositoryModel);
     const configureModelRouter = new ConfigureRouterModel(
-        express,
         useCasesModel,
     );
     const routerModel = configureModelRouter.setRouter();
-    server.addRouter('/api/v1', routerModel);
+    server.addRouter('/api/v1/models', routerModel);
 
     server.listen(env.PORT);
 })();

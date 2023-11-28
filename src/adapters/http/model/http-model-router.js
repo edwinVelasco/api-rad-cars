@@ -1,32 +1,33 @@
+const express = require('express');
+
 const { check } = require('express-validator');
 
-const { validModel } = require('../middlewares');
+const { validRequest } = require('../middlewares');
 const HandlersModel = require('./http-model-handlers');
 
 module.exports = class ConfigureRouterModel {
-    constructor(express, modelUseCases) {
-        this.express = express;
+    constructor(modelUseCases) {
         this.modelUseCases = modelUseCases;
         this.router = null;
     }
 
     setRouter() {
-        this.router = this.express.Router();
+        this.router = express.Router();
         const modelHandlers = new HandlersModel(
             this.modelUseCases,
         );
         this.router.get(
-            '/models/',
+            '/',
             modelHandlers.getModelHandler,
         );
 
         this.router.post(
-            '/models/',
+            '/',
             modelHandlers.postModelHandler,
         );
 
         this.router.put(
-            '/models/:id/',
+            '/:id/',
             [
                 check('id', 'id is required').not().isEmpty(),
                 check('id').custom(async (id) => {
@@ -35,13 +36,13 @@ module.exports = class ConfigureRouterModel {
                     );
                     if (!model) throw new Error(`this model id ${id}, not exists...`);
                 }),
-                validModel,
+                validRequest,
             ],
             modelHandlers.putModelHandler,
         );
 
         this.router.delete(
-            '/models/:id/',
+            '/:id/',
             [
                 check('id', 'id is required').not().isEmpty(),
                 check('id').custom(async (id) => {
@@ -50,7 +51,7 @@ module.exports = class ConfigureRouterModel {
                     );
                     if (!model) throw new Error(`this model id ${id}, not exists...`);
                 }),
-                validModel,
+                validRequest,
             ],
             modelHandlers.deleteModelHandler,
         );
