@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize');
 
-const ModelModel = (Client, markModel) => {
-    const model = Client.define(
-        'categories',
+const ProductModel = (Client, modelModel, categoryModel) => {
+    const product = Client.define(
+        'products',
         {
             id: {
                 type: DataTypes.INTEGER,
@@ -10,10 +10,34 @@ const ModelModel = (Client, markModel) => {
                 allowNull: false,
                 primaryKey: true,
             },
+            code: {
+                type: DataTypes.INTEGER,
+            },
             name: {
                 type: DataTypes.STRING,
             },
-            mark_id: {
+            description: {
+                type: DataTypes.TEXT,
+            },
+            price: {
+                type: DataTypes.INTEGER,
+            },
+            stock: {
+                type: DataTypes.INTEGER,
+            },
+            images: {
+                type: DataTypes.JSON,
+            },
+            profit: {
+                type: DataTypes.INTEGER,
+            },
+            transmission: {
+                type: DataTypes.STRING,
+            },
+            model_id: {
+                type: DataTypes.INTEGER,
+            },
+            category_id: {
                 type: DataTypes.INTEGER,
             },
             created_at: {
@@ -37,17 +61,25 @@ const ModelModel = (Client, markModel) => {
             deletedAt: 'deleted_at',
         },
     );
-    markModel.hasMany(model, {
+    modelModel.hasMany(product, {
         foreignKey: 'id',
     });
-    model.belongsTo(markModel, {
-        as: 'mark',
-        foreignKey: 'mark_id',
+    product.belongsTo(modelModel, {
+        as: 'mark_model',
+        foreignKey: 'model_id',
     });
 
-    return model;
+    categoryModel.hasMany(product, {
+        foreignKey: 'id',
+    });
+    product.belongsTo(categoryModel, {
+        as: 'category',
+        foreignKey: 'category_id',
+    });
+
+    return product;
 };
 
 module.exports = {
-    ModelModel,
+    ProductModel,
 };

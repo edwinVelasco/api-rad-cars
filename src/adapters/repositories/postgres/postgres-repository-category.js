@@ -2,34 +2,30 @@ const { Op } = require('sequelize');
 const moment = require('moment-timezone');
 
 const {
-    ProviderModel,
-} = require('./models/provider-model');
+    CategoryModel,
+} = require('./models/category-model');
 
-class PostgresRepositoryProvider {
-    // eslint-disable-next-line no-restricted-syntax
+class PostgresRepositoryCategory {
     constructor(client) {
         this.client = client;
-        this.providerModel = ProviderModel(this.client);
+        this.categoryModel = CategoryModel(this.client);
     }
 
-    getProviderRepository(id) {
+    getCategoryRepository(id) {
         try {
-            return this.client.models.providers.findByPk(id);
+            return this.client.models.categories.findByPk(id);
         } catch (error) {
             return null;
         }
     }
 
-    async getAllProviderRepository() {
+    async getAllCategoryRepository() {
         try {
-            const result = await this.client.models.providers.findAll({
+            const result = await this.client.models.categories.findAll({
                 where: { deleted_at: { [Op.is]: null } },
                 attributes: [
                     'id',
-                    'nit',
                     'name',
-                    'contact',
-                    'email',
                 ],
             });
 
@@ -39,28 +35,24 @@ class PostgresRepositoryProvider {
         }
     }
 
-    async createProviderRepository(payload) {
+    async createCategoryRepository(payload) {
         try {
             const now = moment().tz('UTC');
-            const result = await this.client.models.providers.create({
-                nit: payload.nit,
+            const result = await this.client.models.categories.create({
                 name: payload.name,
-                contact: payload.name,
-                email: payload.email,
                 created_at: now,
                 updated_at: now,
             });
-
             return [{ data: result }, null];
         } catch (error) {
             return [{ data: [] }, error];
         }
     }
 
-    async updateProviderRepository(payload, id) {
+    async updateCategoryRepository(payload, id) {
         try {
             const now = moment().tz('UTC');
-            const result = await this.client.models.providers.update(
+            const result = await this.client.models.categories.update(
                 {
                     ...payload,
                     updated_at: now,
@@ -69,29 +61,27 @@ class PostgresRepositoryProvider {
             );
             return [result, null, 200];
         } catch (error) {
-            console.log(`Sequelize error in set providers completed: ${error.parent.sqlMessage}`);
+            console.log(`Sequelize error in set marks completed: ${error.parent.sqlMessage}`);
 
             return [null, error, 400];
         }
     }
 
-    async deleteProviderRepository(id) {
+    async deleteCategoryRepository(id) {
         try {
-            return await this.client.models.providers.update(
+            return await this.client.models.categories.update(
                 {
                     deleted_at: moment().tz('UTC'),
                 },
                 {
-                    where: {
-                        id,
-                    },
+                    where: { id },
                 },
             );
         } catch (error) {
-            console.log(`Sequelize error in delete providers: ${error.parent.sqlMessage}`);
+            console.log(`Sequelize error in delete marks: ${error.parent.sqlMessage}`);
             return error;
         }
     }
 }
 
-module.exports = PostgresRepositoryProvider;
+module.exports = PostgresRepositoryCategory;

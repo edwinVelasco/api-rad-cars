@@ -1,11 +1,11 @@
-module.exports = class HandlersProvider {
-    constructor(providerUseCases) {
-        this.providerUseCases = providerUseCases;
+module.exports = class HandlersQuotation {
+    constructor(quotationUseCases) {
+        this.quotationUseCases = quotationUseCases;
     }
 
-    getProviderHandler = async (req, res) => {
+    getQuotationHandler = async (req, res) => {
         try {
-            const { message, code } = await this.providerUseCases.getProvidersUseCase(
+            const { message, code } = await this.quotationUseCases.getQuotationsUseCase(
                 req.query,
             );
             if (code >= 400) return res.status(code).send(message);
@@ -20,13 +20,13 @@ module.exports = class HandlersProvider {
         }
     };
 
-    postProviderHandler = async (req, res) => {
+    postQuotationHandler = async (req, res) => {
         try {
             const {
                 message,
                 code,
                 error = null,
-            } = await this.providerUseCases.createProvidersUseCase(
+            } = await this.quotationUseCases.createQuotationUseCase(
                 req.body,
             );
             if (code >= 400) return res.status(code).send({ message, error });
@@ -41,7 +41,7 @@ module.exports = class HandlersProvider {
         }
     };
 
-    putProviderHandler = async (req, res) => {
+    putQuotationHandler = async (req, res) => {
         try {
             const { id } = req.params;
             const {
@@ -49,7 +49,7 @@ module.exports = class HandlersProvider {
                 code,
                 data,
                 error = null,
-            } = await this.providerUseCases.updateProvidersUseCase(req.body, id);
+            } = await this.quotationUseCases.updateQuotationUseCase(req.body, id);
 
             if (code === 400) return res.status(code).send({ message, error });
             return res.status(code).send({
@@ -60,19 +60,18 @@ module.exports = class HandlersProvider {
             return res.status(500).send({
                 code: 'fail',
                 message: 'there was an internal error',
-                err: error,
             });
         }
     };
 
-    deleteProviderHandler = async (req, res) => {
+    deleteQuotationHandler = async (req, res) => {
         try {
             const { id } = req.params;
             const {
                 message,
                 code,
                 error = null,
-            } = await this.providerUseCases.deleteProvidersUseCase(id);
+            } = await this.quotationUseCases.deleteQuotationUseCase(id);
 
             if (code === 400) return res.status(code).send({ message, error });
             return res.status(code).send({
@@ -82,7 +81,6 @@ module.exports = class HandlersProvider {
             return res.status(500).send({
                 code: 'fail',
                 message: 'there was an internal error',
-                err: error,
             });
         }
     };

@@ -27,8 +27,8 @@ class UseCasesProvider {
     }
 
     async deleteProvidersUseCase(id) {
-        const [providers] = await this.repositoryProvider.deleteProviderRepository(id);
-        if (providers) return { message: providers, code: 204 };
+        const provider = await this.repositoryProvider.deleteProviderRepository(id);
+        if (provider) return { message: provider, code: 204 };
         return { message: 'Conflict', code: 409 };
     }
 

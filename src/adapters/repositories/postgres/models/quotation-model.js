@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize');
 
-const PriorityLevelModel = (Client) => {
-    const model = Client.define(
-        'rad_cars_providers',
+const QuotationModel = (Client, productModel, providerModel) => {
+    const quotation = Client.define(
+        'quotations',
         {
             id: {
                 type: DataTypes.INTEGER,
@@ -10,14 +10,17 @@ const PriorityLevelModel = (Client) => {
                 allowNull: false,
                 primaryKey: true,
             },
-            nit: {
-                type: DataTypes.STRING,
+            price: {
+                type: DataTypes.INTEGER,
             },
-            contact: {
-                type: DataTypes.STRING,
+            description: {
+                type: DataTypes.TEXT,
             },
-            email: {
-                type: DataTypes.STRING,
+            product_id: {
+                type: DataTypes.INTEGER,
+            },
+            provider_id: {
+                type: DataTypes.INTEGER,
             },
             created_at: {
                 type: DataTypes.DATE,
@@ -40,10 +43,25 @@ const PriorityLevelModel = (Client) => {
             deletedAt: 'deleted_at',
         },
     );
+    productModel.hasMany(quotation, {
+        foreignKey: 'id',
+    });
+    quotation.belongsTo(productModel, {
+        as: 'product',
+        foreignKey: 'product_id',
+    });
 
-    return model;
+    providerModel.hasMany(quotation, {
+        foreignKey: 'id',
+    });
+    quotation.belongsTo(providerModel, {
+        as: 'provider',
+        foreignKey: 'provider_id',
+    });
+
+    return quotation;
 };
 
 module.exports = {
-    PriorityLevelModel,
+    QuotationModel,
 };

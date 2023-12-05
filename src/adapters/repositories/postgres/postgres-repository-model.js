@@ -1,13 +1,9 @@
 const { Op } = require('sequelize');
 const moment = require('moment-timezone');
 
-const {
-    MarkModel,
-} = require('./models/mark-model');
+const { MarkModel } = require('./models/mark-model');
 
-const {
-    ModelModel,
-} = require('./models/model-model');
+const { ModelModel } = require('./models/model-model');
 
 class PostgresRepositoryModel {
     // eslint-disable-next-line no-restricted-syntax
@@ -52,8 +48,8 @@ class PostgresRepositoryModel {
         try {
             const now = moment().tz('UTC');
             const result = await this.client.models.models.create({
-                mark_id: payload.mark,
                 name: payload.name,
+                mark_id: payload.mark_id,
                 created_at: now,
                 updated_at: now,
             });

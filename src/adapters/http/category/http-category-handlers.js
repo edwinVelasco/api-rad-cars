@@ -1,11 +1,11 @@
-module.exports = class HandlersProvider {
-    constructor(providerUseCases) {
-        this.providerUseCases = providerUseCases;
+module.exports = class HandlersCategory {
+    constructor(categoryUseCases) {
+        this.categoryUseCases = categoryUseCases;
     }
 
-    getProviderHandler = async (req, res) => {
+    getCategoriesHandler = async (req, res) => {
         try {
-            const { message, code } = await this.providerUseCases.getProvidersUseCase(
+            const { message, code } = await this.categoryUseCases.getCategoriesUseCase(
                 req.query,
             );
             if (code >= 400) return res.status(code).send(message);
@@ -20,13 +20,13 @@ module.exports = class HandlersProvider {
         }
     };
 
-    postProviderHandler = async (req, res) => {
+    postCategoryHandler = async (req, res) => {
         try {
             const {
                 message,
                 code,
                 error = null,
-            } = await this.providerUseCases.createProvidersUseCase(
+            } = await this.categoryUseCases.createCategoryUseCase(
                 req.body,
             );
             if (code >= 400) return res.status(code).send({ message, error });
@@ -41,7 +41,7 @@ module.exports = class HandlersProvider {
         }
     };
 
-    putProviderHandler = async (req, res) => {
+    putCategoryHandler = async (req, res) => {
         try {
             const { id } = req.params;
             const {
@@ -49,7 +49,7 @@ module.exports = class HandlersProvider {
                 code,
                 data,
                 error = null,
-            } = await this.providerUseCases.updateProvidersUseCase(req.body, id);
+            } = await this.categoryUseCases.updateCategoryUseCase(req.body, id);
 
             if (code === 400) return res.status(code).send({ message, error });
             return res.status(code).send({
@@ -60,19 +60,18 @@ module.exports = class HandlersProvider {
             return res.status(500).send({
                 code: 'fail',
                 message: 'there was an internal error',
-                err: error,
             });
         }
     };
 
-    deleteProviderHandler = async (req, res) => {
+    deleteCategoryHandler = async (req, res) => {
         try {
             const { id } = req.params;
             const {
                 message,
                 code,
                 error = null,
-            } = await this.providerUseCases.deleteProvidersUseCase(id);
+            } = await this.categoryUseCases.deletecategoryUseCase(id);
 
             if (code === 400) return res.status(code).send({ message, error });
             return res.status(code).send({
@@ -82,7 +81,6 @@ module.exports = class HandlersProvider {
             return res.status(500).send({
                 code: 'fail',
                 message: 'there was an internal error',
-                err: error,
             });
         }
     };

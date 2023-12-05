@@ -10,6 +10,7 @@ class UseCasesModel {
     }
 
     async createModelsUseCase(payload) {
+        console.log('Result:', JSON.stringify(payload));
         const [, error] = await this.repositoryModel.createModelRepository(payload);
         if (!error) return { message: 'Created', code: 201 };
         return { message: 'Conflict', code: 409, error };
@@ -27,8 +28,8 @@ class UseCasesModel {
     }
 
     async deleteModelUseCase(id) {
-        const provider = await this.repositoryModel.deleteModelRepository(id);
-        if (provider) return { message: provider, code: 204 };
+        const model = await this.repositoryModel.deleteModelRepository(id);
+        if (model) return { message: model, code: 204 };
         return { message: 'Conflict', code: 409 };
     }
 

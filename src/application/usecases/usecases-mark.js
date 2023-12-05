@@ -27,8 +27,8 @@ class UseCasesMark {
     }
 
     async deleteMarkUseCase(id) {
-        const provider = await this.repositoryMark.deleteMarkRepository(id);
-        if (provider) return { message: provider, code: 204 };
+        const mark = await this.repositoryMark.deleteMarkRepository(id);
+        if (mark) return { message: mark, code: 204 };
         return { message: 'Conflict', code: 409 };
     }
 
