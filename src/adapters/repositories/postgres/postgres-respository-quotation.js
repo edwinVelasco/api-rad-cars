@@ -33,10 +33,13 @@ class PostgresRepositoryQuotations {
         }
     }
 
-    async getAllQuotationsRepository() {
+    async getAllQuotationsRepository(id) {
         try {
             const result = await this.client.models.quotations.findAll({
-                where: { deleted_at: { [Op.is]: null } },
+                where: {
+                    deleted_at: { [Op.is]: null },
+                    product_id: id,
+                },
                 include: [
                     {
                         model: this.productModel,
@@ -54,6 +57,7 @@ class PostgresRepositoryQuotations {
                     'price',
                     'description',
                 ],
+                order: [['id', 'ASC']],
             });
 
             return [{ data: result }, null];

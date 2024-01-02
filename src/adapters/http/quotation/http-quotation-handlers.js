@@ -5,8 +5,9 @@ module.exports = class HandlersQuotation {
 
     getQuotationHandler = async (req, res) => {
         try {
+            const { id } = req.params;
             const { message, code } = await this.quotationUseCases.getQuotationsUseCase(
-                req.query,
+                parseInt(id, 10),
             );
             if (code >= 400) return res.status(code).send(message);
             return res.status(code).send({

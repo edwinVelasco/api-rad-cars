@@ -1,40 +1,35 @@
 const { Op } = require('sequelize');
 const moment = require('moment-timezone');
 
-const { MarkModel } = require('./models/mark-model');
+const { UserModel } = require('./models/user-model');
+const { encrypt } = require('../../../utils/handleBcrypt');
 
-const { ModelModel } = require('./models/model-model');
-
-class PostgresRepositoryModel {
-    // eslint-disable-next-line no-restricted-syntax
+class PostgresRepositoryUser {
     constructor(client) {
         this.client = client;
-        this.markModel = MarkModel(this.client);
-        this.modelModel = ModelModel(this.client, this.markModel);
+        this.userModel = UserModel(this.client);
     }
 
-    getModelRepository(id) {
+    getUserRepository(id) {
         try {
-            return this.client.models.models.findByPk(id);
+            return this.client.models.users.findByPk(id);
         } catch (error) {
             return null;
         }
     }
 
-    async getAllModelRepository() {
+    async getAllUserRepository() {
         try {
-            const result = await this.client.models.models.findAll({
+            const result = await this.client.models.users.findAll({
                 where: { deleted_at: { [Op.is]: null } },
-                include: [
-                    {
-                        model: this.markModel,
-                        as: 'mark',
-                        attributes: ['id', 'name'],
-                    },
-                ],
                 attributes: [
                     'id',
+                    'cc',
                     'name',
+                    'phone',
+                    'email',
+                    'password',
+                    'address',
                 ],
                 order: [['name', 'ASC']],
             });
@@ -45,12 +40,17 @@ class PostgresRepositoryModel {
         }
     }
 
-    async createModelRepository(payload) {
+    async createUserRepository(payload) {
         try {
             const now = moment().tz('UTC');
-            const result = await this.client.models.models.create({
+            const passwordHash = await encrypt(payload.password);
+            const result = await this.client.models.users.create({
+                cc: payload.cc,
                 name: payload.name,
-                mark_id: payload.mark_id,
+                phone: payload.phone,
+                email: payload.email,
+                password: passwordHash,
+                address: payload.address,
                 created_at: now,
                 updated_at: now,
             });
@@ -61,10 +61,10 @@ class PostgresRepositoryModel {
         }
     }
 
-    async updateModelRepository(payload, id) {
+    async updateUserRepository(payload, id) {
         try {
             const now = moment().tz('UTC');
-            const result = await this.client.models.models.update(
+            const result = await this.client.models.users.update(
                 {
                     ...payload,
                     updated_at: now,
@@ -73,27 +73,25 @@ class PostgresRepositoryModel {
             );
             return [result, null, 200];
         } catch (error) {
-            console.log(`Sequelize error in set models completed: ${error.parent.sqlMessage}`);
+            console.log(`Sequelize error in set users completed: ${error.parent.sqlMessage}`);
 
             return [null, error, 400];
         }
     }
 
-    async deleteModelRepository(id) {
+    async deleteUserRepository(id) {
         try {
-            return await this.client.models.models.update(
+            return await this.client.models.users.update(
                 {
                     deleted_at: moment().tz('UTC'),
                 },
-                {
-                    where: { id },
-                },
+                { where: { id } },
             );
         } catch (error) {
-            console.log(`Sequelize error in delete models: ${error.parent.sqlMessage}`);
+            console.log(`Sequelize error in delete providers: ${error.parent.sqlMessage}`);
             return error;
         }
     }
 }
 
-module.exports = PostgresRepositoryModel;
+module.exports = PostgresRepositoryUser;

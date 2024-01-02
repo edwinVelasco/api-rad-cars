@@ -1,6 +1,5 @@
 const express = require('express');
-
-const { check } = require('express-validator');
+const { check, checkExact, body } = require('express-validator');
 
 const { validRequest } = require('../middlewares');
 const HandlersCategory = require('./http-category-handlers');
@@ -23,6 +22,13 @@ module.exports = class ConfigureRouterCategory {
 
         this.router.post(
             '/',
+            [
+                check('name', 'name is required').not().isEmpty(),
+                checkExact([body('name').isLength({ min: 3 })], {
+                    message: 'Too many fields specified',
+                }),
+                validRequest,
+            ],
             categoryHandlers.postCategoryHandler,
         );
 
@@ -50,6 +56,7 @@ module.exports = class ConfigureRouterCategory {
                         parseInt(id, 10),
                     );
                     if (!category) throw new Error(`this category id ${id}, not exists...`);
+                    if (category?.deleted_at !== null) throw new Error(`this category id ${id}, was removed...`);
                 }),
                 validRequest,
             ],

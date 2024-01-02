@@ -31,6 +31,7 @@ class PostgresRepositoryProvider {
                     'contact',
                     'email',
                 ],
+                order: [['name', 'ASC']],
             });
 
             return [{ data: result }, null];

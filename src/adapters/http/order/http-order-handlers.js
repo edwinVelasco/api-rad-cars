@@ -1,9 +1,43 @@
-module.exports = class HandlersProduct {
-    constructor(productUseCases) {
-        this.productUseCases = productUseCases;
+module.exports = class HandlersOrder {
+    constructor(orderUseCases) {
+        this.orderUseCases = orderUseCases;
     }
 
-    getProductHandler = async (req, res) => {
+    getOrderHandler = async (req, res) => {
+        try {
+            const { message, code } = await this.orderUseCases.detailOrderUseCase(
+                req.query,
+            );
+            if (code >= 400) return res.status(code).send(message);
+            return res.status(code).send({
+                ...message,
+            });
+        } catch (error) {
+            return res.status(500).send({
+                code: 'fail',
+                message: 'there was an internal error',
+            });
+        }
+    };
+
+    getOrdersHandler = async (req, res) => {
+        try {
+            const { message, code } = await this.orderUseCases.getOrdersUseCase(
+                req.query,
+            );
+            if (code >= 400) return res.status(code).send(message);
+            return res.status(code).send({
+                ...message,
+            });
+        } catch (error) {
+            return res.status(500).send({
+                code: 'fail',
+                message: 'there was an internal error',
+            });
+        }
+    };
+
+    getDetailOrdertHandler = async (req, res) => {
         try {
             const { id } = req.params;
             const {
@@ -11,7 +45,7 @@ module.exports = class HandlersProduct {
                 code,
                 data,
                 error = null,
-            } = await this.productUseCases.getOneProductUseCase(
+            } = await this.orderUseCases.getDetailOrderUseCase(
                 parseInt(id, 10),
             );
             if (code >= 400) return res.status(code).send({ message, error });
@@ -27,30 +61,13 @@ module.exports = class HandlersProduct {
         }
     };
 
-    getProductsHandler = async (req, res) => {
-        try {
-            const { message, code } = await this.productUseCases.getProductsUseCase(
-                req.query,
-            );
-            if (code >= 400) return res.status(code).send(message);
-            return res.status(code).send({
-                ...message,
-            });
-        } catch (error) {
-            return res.status(500).send({
-                code: 'fail',
-                message: 'there was an internal error',
-            });
-        }
-    };
-
-    postProductHandler = async (req, res) => {
+    postOrderHandler = async (req, res) => {
         try {
             const {
                 message,
                 code,
                 error = null,
-            } = await this.productUseCases.createProductUseCase(
+            } = await this.orderUseCases.createOrderUseCase(
                 req.body,
             );
             if (code >= 400) return res.status(code).send({ message, error });
@@ -65,7 +82,7 @@ module.exports = class HandlersProduct {
         }
     };
 
-    putProductHandler = async (req, res) => {
+    putOrderHandler = async (req, res) => {
         try {
             const { id } = req.params;
             const {
@@ -73,7 +90,7 @@ module.exports = class HandlersProduct {
                 code,
                 data,
                 error = null,
-            } = await this.productUseCases.updateProductUseCase(req.body, id);
+            } = await this.orderUseCases.updateOrderUseCase(req.body, id);
 
             if (code === 400) return res.status(code).send({ message, error });
             return res.status(code).send({
@@ -88,15 +105,19 @@ module.exports = class HandlersProduct {
         }
     };
 
-    deleteProductHandler = async (req, res) => {
+    deleteOrderHandler = async (req, res) => {
         try {
             const { id } = req.params;
             const {
+                message,
                 code,
-                data,
-            } = await this.productUseCases.deleteProductUseCase(id);
+                error = null,
+            } = await this.orderUseCases.deleteOrderUseCase(id);
 
-            return res.status(code).send({ data });
+            if (code === 400) return res.status(code).send({ message, error });
+            return res.status(code).send({
+                data: message,
+            });
         } catch (error) {
             return res.status(500).send({
                 code: 'fail',

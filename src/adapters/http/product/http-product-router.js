@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { check } = require('express-validator');
+const { check, checkExact, body } = require('express-validator');
 
 const { validRequest } = require('../middlewares');
 const HandlersProduct = require('./http-product-handlers');
@@ -26,10 +26,11 @@ module.exports = class ConfigureRouterProduct {
             [
                 check('id', 'id is required').not().isEmpty(),
                 check('id').custom(async (id) => {
-                    const product = await this.productUseCases.getOneProductUseCase(
+                    const product = await this.productUseCases.getProductUseCase(
                         parseInt(id, 10),
                     );
                     if (!product) throw new Error(`this product id ${id}, not exists...`);
+                    if (product?.deleted_at) throw new Error(`this product id ${id}, not exists...`);
                 }),
                 validRequest,
             ],
@@ -38,6 +39,27 @@ module.exports = class ConfigureRouterProduct {
 
         this.router.post(
             '/',
+            [
+                check('code', 'code is required').not().isEmpty(),
+                check('name', 'name is required').not().isEmpty(),
+                check('price', 'price is required').not().isEmpty(),
+                check('description', 'description is required').not().isEmpty(),
+                checkExact([
+                    body('profit').isNumeric(),
+                    body('price').isNumeric(),
+                    body('stock').isNumeric(),
+                    body('mark_model').isNumeric(),
+                    body('category').isNumeric(),
+                    body('images').isURL(),
+                    body('transmission').isString(),
+                    body('code').isLength({ min: 4 }),
+                    body('price').isLength({ min: 3 }),
+                    body('name').isLength({ min: 3 }),
+                    body('description').isLength({ min: 4 })], {
+                    message: 'Too many fields specified',
+                }),
+                validRequest,
+            ],
             productHandlers.postProductHandler,
         );
 
@@ -65,7 +87,7 @@ module.exports = class ConfigureRouterProduct {
                         parseInt(id, 10),
                     );
                     if (!product) throw new Error(`this product id ${id}, not exists...`);
-                    if (product?.deleted_at !== '') throw new Error(`this product id ${id}, was removed...`);
+                    if (product?.deleted_at !== null) throw new Error(`this product id ${id}, was removed...`);
                 }),
                 validRequest,
             ],

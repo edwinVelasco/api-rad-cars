@@ -28,6 +28,7 @@ class PostgresRepositoryMark {
                     'id',
                     'name',
                 ],
+                order: [['name', 'ASC']],
             });
 
             return [{ data: result }, null];

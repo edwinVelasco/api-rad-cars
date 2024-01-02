@@ -16,6 +16,8 @@ const PostgresRepositoryModel = require('./adapters/repositories/postgres/postgr
 const PostgresRepositoryCategory = require('./adapters/repositories/postgres/postgres-repository-category');
 const PostgresRepositoryProduct = require('./adapters/repositories/postgres/postgres-repository-product');
 const PostgresRepositoryQuotation = require('./adapters/repositories/postgres/postgres-respository-quotation');
+const PostgresRepositoryUser = require('./adapters/repositories/postgres/postgres-repository-user');
+const PostgresRepositoryOrder = require('./adapters/repositories/postgres/postgres-repository-order');
 
 /**
  * Config Routers
@@ -26,6 +28,8 @@ const ConfigureRouterModel = require('./adapters/http/model/http-model-router');
 const ConfigureRouterCategory = require('./adapters/http/category/http-category-router');
 const ConfigureRouterProduct = require('./adapters/http/product/http-product-router');
 const ConfigureRouterQuotation = require('./adapters/http/quotation/http-quotation-router');
+const ConfigureRouterUser = require('./adapters/http/user/http-user-router');
+const ConfigureRouterOrder = require('./adapters/http/order/http-order-router');
 
 /**
  * UseCases
@@ -36,6 +40,8 @@ const UseCasesModel = require('./application/usecases/usecases-model');
 const UseCasesCategory = require('./application/usecases/usecases-category');
 const UseCasesProduct = require('./application/usecases/usecases-product');
 const UseCasesQuotation = require('./application/usecases/usecases-quotation');
+const UseCasesUser = require('./application/usecases/usecases-user');
+const UseCasesOrder = require('./application/usecases/usecases-order');
 
 (async () => {
     const postgresClient = await createPostgresClient(
@@ -107,11 +113,32 @@ const UseCasesQuotation = require('./application/usecases/usecases-quotation');
         postgresClient,
     );
     const useCasesQuotation = new UseCasesQuotation(postgresRepositoryQuotation);
-    const configureQuotationRouter = new ConfigureRouterQuotation(
-        useCasesQuotation,
-    );
+    // eslint-disable-next-line max-len
+    const configureQuotationRouter = new ConfigureRouterQuotation(useCasesQuotation, useCasesProduct);
     const routerQuotation = configureQuotationRouter.setRouter();
     server.addRouter('/api/v1/products', routerQuotation);
+
+    // user
+    const postgresRepositoryUser = new PostgresRepositoryUser(
+        postgresClient,
+    );
+    const useCasesUser = new UseCasesUser(postgresRepositoryUser);
+    const configureUserRouter = new ConfigureRouterUser(
+        useCasesUser,
+    );
+    const routerUser = configureUserRouter.setRouter();
+    server.addRouter('/api/v1/users', routerUser);
+
+    // order
+    const postgresRepositoryOrder = new PostgresRepositoryOrder(
+        postgresClient,
+    );
+    const useCasesOrder = new UseCasesOrder(postgresRepositoryOrder);
+    const configureOrderRouter = new ConfigureRouterOrder(
+        useCasesOrder,
+    );
+    const routerOrder = configureOrderRouter.setRouter();
+    server.addRouter('/api/v1/orders', routerOrder);
 
     server.listen(env.PORT);
 })();

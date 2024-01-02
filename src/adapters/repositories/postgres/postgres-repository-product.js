@@ -2,12 +2,11 @@ const { Op } = require('sequelize');
 const moment = require('moment-timezone');
 
 const { ProductModel } = require('./models/product-model');
-
 const { ModelModel } = require('./models/model-model');
-
 const { CategoryModel } = require('./models/category-model');
-
 const { MarkModel } = require('./models/mark-model');
+const { QuotationModel } = require('./models/quotation-model');
+const { ProviderModel } = require('./models/provider-model');
 
 class PostgresRepositoryProducts {
     // eslint-disable-next-line no-restricted-syntax
@@ -18,6 +17,8 @@ class PostgresRepositoryProducts {
         this.modelModel = ModelModel(this.client, this.markModel);
         // eslint-disable-next-line max-len
         this.productModel = ProductModel(this.client, this.modelModel, this.categoryModel);
+        this.providerModel = ProviderModel(this.client);
+        this.quotationModel = QuotationModel(this.client, this.productModel, this.providerModel);
     }
 
     // get product
@@ -33,7 +34,7 @@ class PostgresRepositoryProducts {
     async getOneProductRepository(id) {
         try {
             const result = await this.client.models.products.findAll({
-                where: { id },
+                where: { id, deleted_at: { [Op.is]: null } },
                 model_id: {
                     as: 'mark_model',
                     attributes: ['id', 'name'],
@@ -124,9 +125,11 @@ class PostgresRepositoryProducts {
                     'images',
                     'transmission',
                 ],
+
                 where: {
                     deleted_at: { [Op.is]: null },
                 },
+                order: [['name', 'ASC']],
             };
 
             // search products by name, description, code, category, mark, model
@@ -194,14 +197,31 @@ class PostgresRepositoryProducts {
 
     async deleteProductRepository(id) {
         try {
-            return await this.client.models.products.update(
-                {
-                    deleted_at: moment().tz('UTC'),
-                },
-                {
-                    where: { id },
-                },
-            );
+            const productQuotation = await this.client.models.quotations.findAll({
+                where: { product_id: id },
+            });
+
+            if (productQuotation.length > 0) {
+                return {
+                    data: {
+                        code: 'fail',
+                        message: 'No se puede eliminar el producto, porque tiene cotizaciones asociadas.',
+                    },
+                    statusCode: 409,
+                };
+            }
+
+            return {
+                data: await this.client.models.products.update(
+                    {
+                        deleted_at: moment().tz('UTC'),
+                    },
+                    {
+                        where: { id },
+                    },
+                ),
+                statusCode: 204,
+            };
         } catch (error) {
             console.log(`Sequelize error in delete products: ${error.parent.sqlMessage}`);
             return error;

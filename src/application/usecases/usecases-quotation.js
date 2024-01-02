@@ -3,8 +3,8 @@ class UseCasesQuotation {
         this.repositoryQuotation = repositoryQuotation;
     }
 
-    async getQuotationsUseCase() {
-        const [quotation] = await this.repositoryQuotation.getAllQuotationsRepository();
+    async getQuotationsUseCase(id) {
+        const [quotation] = await this.repositoryQuotation.getAllQuotationsRepository(id);
         if (quotation) return { message: quotation, code: 200 };
         return { message: 'Conflict', code: 409 };
     }

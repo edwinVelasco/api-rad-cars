@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { check } = require('express-validator');
+const { check, checkExact, body } = require('express-validator');
 
 const { validRequest } = require('../middlewares');
 const HandlersMark = require('./http-mark-handlers');
@@ -23,6 +23,13 @@ module.exports = class ConfigureRouterMark {
 
         this.router.post(
             '/',
+            [
+                check('name', 'name is required').not().isEmpty(),
+                checkExact([body('name').isLength({ min: 3 })], {
+                    message: 'Too many fields specified',
+                }),
+                validRequest,
+            ],
             markHandlers.postMarkHandler,
         );
 
@@ -50,6 +57,7 @@ module.exports = class ConfigureRouterMark {
                         parseInt(id, 10),
                     );
                     if (!mark) throw new Error(`this mark id ${id}, not exists...`);
+                    if (mark?.deleted_at !== null) throw new Error(`this mark id ${id}, was removed...`);
                 }),
                 validRequest,
             ],

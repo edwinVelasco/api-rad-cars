@@ -27,9 +27,8 @@ class UseCasesProduct {
     }
 
     async deleteProductUseCase(id) {
-        const model = await this.repositoryProduct.deleteProductRepository(id);
-        if (model) return { message: model, code: 204 };
-        return { message: 'Conflict', code: 409 };
+        const { data, statusCode } = await this.repositoryProduct.deleteProductRepository(id);
+        return { code: statusCode, data };
     }
 
     async getOneProductUseCase(id) {
