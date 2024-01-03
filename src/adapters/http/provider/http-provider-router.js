@@ -1,6 +1,6 @@
 const { check, checkExact, body } = require('express-validator');
 const express = require('express');
-const { validRequest } = require('../middlewares');
+const { validRequest, checkAuth, checkRoleAuth } = require('../middlewares');
 const HandlersProvider = require('./http-provider-handlers');
 
 module.exports = class ConfigureRouterProvider {
@@ -16,11 +16,15 @@ module.exports = class ConfigureRouterProvider {
         );
         this.router.get(
             '/',
+            checkAuth,
+            checkRoleAuth(process.env.PERMISSIONS),
             providerHandlers.getProviderHandler,
         );
 
         this.router.post(
             '/',
+            checkAuth,
+            checkRoleAuth(process.env.PERMISSIONS),
             [
                 check('nit', 'nit is required').not().isEmpty(),
                 check('name', 'name is required').not().isEmpty(),
@@ -36,6 +40,8 @@ module.exports = class ConfigureRouterProvider {
 
         this.router.put(
             '/:id/',
+            checkAuth,
+            checkRoleAuth(process.env.PERMISSIONS),
             [
                 check('id', 'id is required').not().isEmpty(),
                 check('id').custom(async (id) => {
@@ -51,6 +57,8 @@ module.exports = class ConfigureRouterProvider {
 
         this.router.delete(
             '/:id/',
+            checkAuth,
+            checkRoleAuth(process.env.PERMISSIONS),
             [
                 check('id', 'id is required').not().isEmpty(),
                 check('id').custom(async (id) => {

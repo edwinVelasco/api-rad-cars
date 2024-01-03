@@ -27,6 +27,9 @@ const UserModel = (Client) => Client.define(
         address: {
             type: DataTypes.TEXT,
         },
+        role: {
+            type: DataTypes.STRING(30),
+        },
         created_at: {
             type: DataTypes.DATE,
         },

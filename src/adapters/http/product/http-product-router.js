@@ -2,7 +2,7 @@ const express = require('express');
 
 const { check, checkExact, body } = require('express-validator');
 
-const { validRequest } = require('../middlewares');
+const { validRequest, checkAuth, checkRoleAuth } = require('../middlewares');
 const HandlersProduct = require('./http-product-handlers');
 
 module.exports = class ConfigureRouterProduct {
@@ -39,6 +39,8 @@ module.exports = class ConfigureRouterProduct {
 
         this.router.post(
             '/',
+            checkAuth,
+            checkRoleAuth(process.env.PERMISSIONS),
             [
                 check('code', 'code is required').not().isEmpty(),
                 check('name', 'name is required').not().isEmpty(),
@@ -65,6 +67,8 @@ module.exports = class ConfigureRouterProduct {
 
         this.router.put(
             '/:id/',
+            checkAuth,
+            checkRoleAuth(process.env.PERMISSIONS),
             [
                 check('id', 'id is required').not().isEmpty(),
                 check('id').custom(async (id) => {
@@ -80,6 +84,8 @@ module.exports = class ConfigureRouterProduct {
 
         this.router.delete(
             '/:id/',
+            checkAuth,
+            checkRoleAuth(process.env.PERMISSIONS),
             [
                 check('id', 'id is required').not().isEmpty(),
                 check('id').custom(async (id) => {

@@ -1,7 +1,7 @@
 const express = require('express');
 const { check, checkExact, body } = require('express-validator');
 
-const { validRequest } = require('../middlewares');
+const { validRequest, checkAuth, checkRoleAuth } = require('../middlewares');
 const HandlersCategory = require('./http-category-handlers');
 
 module.exports = class ConfigureRouterCategory {
@@ -22,6 +22,8 @@ module.exports = class ConfigureRouterCategory {
 
         this.router.post(
             '/',
+            checkAuth,
+            checkRoleAuth(process.env.PERMISSIONS),
             [
                 check('name', 'name is required').not().isEmpty(),
                 checkExact([body('name').isLength({ min: 3 })], {
@@ -34,6 +36,8 @@ module.exports = class ConfigureRouterCategory {
 
         this.router.put(
             '/:id/',
+            checkAuth,
+            checkRoleAuth(process.env.PERMISSIONS),
             [
                 check('id', 'id is required').not().isEmpty(),
                 check('id').custom(async (id) => {
@@ -49,6 +53,8 @@ module.exports = class ConfigureRouterCategory {
 
         this.router.delete(
             '/:id/',
+            checkAuth,
+            checkRoleAuth(process.env.PERMISSIONS),
             [
                 check('id', 'id is required').not().isEmpty(),
                 check('id').custom(async (id) => {

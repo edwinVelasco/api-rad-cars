@@ -2,7 +2,8 @@ const { Op } = require('sequelize');
 const moment = require('moment-timezone');
 
 const { UserModel } = require('./models/user-model');
-const { encrypt } = require('../../../utils/handleBcrypt');
+const { encrypt, compare } = require('../../../utils/handleBcrypt');
+const { tokenSign } = require('../../../utils/generateToken');
 
 class PostgresRepositoryUser {
     constructor(client) {
@@ -13,6 +14,14 @@ class PostgresRepositoryUser {
     getUserRepository(id) {
         try {
             return this.client.models.users.findByPk(id);
+        } catch (error) {
+            return null;
+        }
+    }
+
+    getUserByEmailRepository(email) {
+        try {
+            return this.client.models.users.findOne({ where: { email } });
         } catch (error) {
             return null;
         }
@@ -29,6 +38,7 @@ class PostgresRepositoryUser {
                     'phone',
                     'email',
                     'password',
+                    'role',
                     'address',
                 ],
                 order: [['name', 'ASC']],
@@ -51,6 +61,7 @@ class PostgresRepositoryUser {
                 email: payload.email,
                 password: passwordHash,
                 address: payload.address,
+                role: payload.role,
                 created_at: now,
                 updated_at: now,
             });
@@ -58,6 +69,29 @@ class PostgresRepositoryUser {
             return [{ data: result }, null];
         } catch (error) {
             return [{ data: [] }, error];
+        }
+    }
+
+    async loginUserRepository(payload) {
+        try {
+            const { email, password } = payload;
+            const user = await this.client.models.users.findOne({ where: { email } });
+            const checkPassword = await compare(password, user.password);
+            const tokenSession = await tokenSign(user);
+            if (!checkPassword) {
+                const message = {
+                    message: 'Invalid password',
+                };
+
+                return [message, 409];
+            }
+            const result = {
+                user,
+                tokenSession,
+            };
+            return [result, null];
+        } catch (error) {
+            return ['Verifique el email o la password', error];
         }
     }
 

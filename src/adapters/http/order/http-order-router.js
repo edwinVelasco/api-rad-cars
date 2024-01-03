@@ -2,7 +2,7 @@ const express = require('express');
 
 const { check } = require('express-validator');
 
-const { validRequest } = require('../middlewares');
+const { validRequest, checkAuth, checkRoleAuth } = require('../middlewares');
 const HandlersOrder = require('./http-order-handlers');
 
 module.exports = class ConfigureRouterOrder {
@@ -16,13 +16,11 @@ module.exports = class ConfigureRouterOrder {
         const orderHandlers = new HandlersOrder(
             this.orderUseCases,
         );
-        this.router.get(
-            '/',
-            orderHandlers.getOrdersHandler,
-        );
+        this.router.get('/', checkAuth, orderHandlers.getOrdersHandler);
 
         this.router.get(
             '/:id/',
+            checkAuth,
             [
                 check('id', 'id is required').not().isEmpty(),
                 validRequest,
@@ -32,11 +30,18 @@ module.exports = class ConfigureRouterOrder {
 
         this.router.post(
             '/',
+            checkAuth,
+            [
+                check('order.user_id', 'usuario is required').not().isEmpty(),
+                check('products', 'productos is required').not().isEmpty(),
+                validRequest,
+            ],
             orderHandlers.postOrderHandler,
         );
 
         this.router.put(
             '/:id/',
+            checkAuth,
             [
                 check('id', 'id is required').not().isEmpty(),
                 check('id').custom(async (id) => {
@@ -52,6 +57,8 @@ module.exports = class ConfigureRouterOrder {
 
         this.router.delete(
             '/:id/',
+            checkAuth,
+            checkRoleAuth(process.env.PERMISSIONS),
             [
                 check('id', 'id is required').not().isEmpty(),
                 check('id').custom(async (id) => {

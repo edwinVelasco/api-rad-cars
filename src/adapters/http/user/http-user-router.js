@@ -1,6 +1,6 @@
 const { check, checkExact, body } = require('express-validator');
 const express = require('express');
-const { validRequest } = require('../middlewares');
+const { validRequest, checkAuth, checkRoleAuth } = require('../middlewares');
 const HandlersUser = require('./http-user-handlers');
 
 module.exports = class ConfigureRouterProvider {
@@ -16,11 +16,14 @@ module.exports = class ConfigureRouterProvider {
         );
         this.router.get(
             '/',
+            checkAuth,
+            checkRoleAuth(process.env.PERMISSIONS),
             userHandlers.getUserHandler,
         );
 
         this.router.get(
             '/:id/',
+            checkAuth,
             [
                 check('id', 'id is required').not().isEmpty(),
                 check('id').custom(async (id) => {
@@ -35,6 +38,7 @@ module.exports = class ConfigureRouterProvider {
             userHandlers.getUserHandler,
         );
 
+        // create user
         this.router.post(
             '/',
             [
@@ -48,10 +52,12 @@ module.exports = class ConfigureRouterProvider {
                     body('email').isEmail(),
                     body('cc').isNumeric(),
                     body('phone').isNumeric(),
+                    body('role').isString(),
                     body('cc').isLength({ min: 8 }),
                     body('phone').isLength({ min: 7 }),
                     body('name').isLength({ min: 3 }),
-                    body('password').isLength({ min: 6 })], {
+                    body('password').isLength({ min: 6 }),
+                    body('role').isLength({ min: 3 })], {
                     message: 'Too many fields specified',
                 }),
                 validRequest,
@@ -59,8 +65,29 @@ module.exports = class ConfigureRouterProvider {
             userHandlers.postUserHandler,
         );
 
+        // Login
+        this.router.post(
+            '/login/',
+            [
+                check('email', 'email is required').not().isEmpty(),
+                check('password', 'password is required').not().isEmpty(),
+                checkExact([
+                    body('email').isEmail(),
+                    body('password').isLength({ min: 6 })], {
+                    message: 'Too many fields specified',
+                }),
+                check('email').custom(async (email) => {
+                    const user = await this.userUseCase.getUserByEmailUseCase(email);
+                    if (!user) throw new Error(`this user email ${email}, not exists...`);
+                }),
+                validRequest,
+            ],
+            userHandlers.postLoginHandler,
+        );
+
         this.router.put(
             '/:id/',
+            checkAuth,
             [
                 check('id', 'id is required').not().isEmpty(),
                 check('id').custom(async (id) => {
@@ -76,6 +103,8 @@ module.exports = class ConfigureRouterProvider {
 
         this.router.delete(
             '/:id/',
+            checkAuth,
+            checkRoleAuth(process.env.PERMISSIONS),
             [
                 check('id', 'id is required').not().isEmpty(),
                 check('id').custom(async (id) => {

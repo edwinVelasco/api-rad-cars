@@ -2,7 +2,7 @@ const express = require('express');
 
 const { check, checkExact, body } = require('express-validator');
 
-const { validRequest } = require('../middlewares');
+const { validRequest, checkAuth, checkRoleAuth } = require('../middlewares');
 const HandlersMark = require('./http-mark-handlers');
 
 module.exports = class ConfigureRouterMark {
@@ -23,6 +23,8 @@ module.exports = class ConfigureRouterMark {
 
         this.router.post(
             '/',
+            checkAuth,
+            checkRoleAuth(process.env.PERMISSIONS),
             [
                 check('name', 'name is required').not().isEmpty(),
                 checkExact([body('name').isLength({ min: 3 })], {
@@ -35,6 +37,8 @@ module.exports = class ConfigureRouterMark {
 
         this.router.put(
             '/:id/',
+            checkAuth,
+            checkRoleAuth(process.env.PERMISSIONS),
             [
                 check('id', 'id is required').not().isEmpty(),
                 check('id').custom(async (id) => {
@@ -50,6 +54,8 @@ module.exports = class ConfigureRouterMark {
 
         this.router.delete(
             '/:id/',
+            checkAuth,
+            checkRoleAuth(process.env.PERMISSIONS),
             [
                 check('id', 'id is required').not().isEmpty(),
                 check('id').custom(async (id) => {

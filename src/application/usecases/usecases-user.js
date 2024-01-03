@@ -15,6 +15,12 @@ class UseCasesUser {
         return { message: 'Conflict', code: 409, error };
     }
 
+    async loginUserUseCase(payload) {
+        const [users, error] = await this.repositoryUser.loginUserRepository(payload);
+        if (!error) return { message: users, code: 201 };
+        return { message: users, code: 409 };
+    }
+
     async updateUserUseCase(payload, id) {
         const [data, error, code] = await this.repositoryUser.updateUserRepository(payload, id);
         if (!error) return { message: 'Updated', code, data };
@@ -31,6 +37,10 @@ class UseCasesUser {
 
     getUserUseCase(id) {
         return this.repositoryUser.getUserRepository(id);
+    }
+
+    getUserByEmailUseCase(email) {
+        return this.repositoryUser.getUserByEmailRepository(email);
     }
 }
 

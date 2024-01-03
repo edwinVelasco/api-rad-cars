@@ -2,7 +2,7 @@ const express = require('express');
 
 const { check, checkExact, body } = require('express-validator');
 
-const { validRequest } = require('../middlewares');
+const { validRequest, checkAuth, checkRoleAuth } = require('../middlewares');
 const HandlersQuotation = require('./http-quotation-handlers');
 
 module.exports = class ConfigureRouterQuotation {
@@ -19,6 +19,8 @@ module.exports = class ConfigureRouterQuotation {
         );
         this.router.get(
             '/:id/quotations/',
+            checkAuth,
+            checkRoleAuth(process.env.PERMISSIONS),
             [
                 check('id', 'id is required').not().isEmpty(),
                 check('id').custom(async (id) => {
@@ -35,6 +37,8 @@ module.exports = class ConfigureRouterQuotation {
 
         this.router.post(
             '/:id/quotations/',
+            checkAuth,
+            checkRoleAuth(process.env.PERMISSIONS),
             [
                 check('id', 'id is required').not().isEmpty(),
                 check('id').custom(async (id) => {
@@ -58,6 +62,8 @@ module.exports = class ConfigureRouterQuotation {
 
         this.router.delete(
             '/:idProduct/quotations/:id/',
+            checkAuth,
+            checkRoleAuth(process.env.PERMISSIONS),
             [
                 check('id', 'id is required').not().isEmpty(),
                 check('id').custom(async (id) => {

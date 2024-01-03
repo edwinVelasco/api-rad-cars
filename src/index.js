@@ -134,9 +134,7 @@ const UseCasesOrder = require('./application/usecases/usecases-order');
         postgresClient,
     );
     const useCasesOrder = new UseCasesOrder(postgresRepositoryOrder);
-    const configureOrderRouter = new ConfigureRouterOrder(
-        useCasesOrder,
-    );
+    const configureOrderRouter = new ConfigureRouterOrder(useCasesOrder);
     const routerOrder = configureOrderRouter.setRouter();
     server.addRouter('/api/v1/orders', routerOrder);
 

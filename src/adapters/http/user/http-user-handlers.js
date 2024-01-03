@@ -41,6 +41,27 @@ module.exports = class HandlersUser {
         }
     };
 
+    postLoginHandler = async (req, res) => {
+        try {
+            const {
+                message,
+                code,
+                error = null,
+            } = await this.userUseCase.loginUserUseCase(
+                req.body,
+            );
+            if (code >= 400) return res.status(code).send({ message, error });
+            return res.status(code).send({
+                data: message,
+            });
+        } catch (error) {
+            return res.status(500).send({
+                code: 'fail',
+                message: 'there was an internal error',
+            });
+        }
+    };
+
     putUserHandler = async (req, res) => {
         try {
             const { id } = req.params;
