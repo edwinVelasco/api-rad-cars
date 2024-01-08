@@ -1,47 +1,47 @@
-const env = require('./infraestructure/dotenv/envs');
+const env = require('./src/infraestructure/dotenv/envs');
 
-const Server = require('./infraestructure/express/express-server');
+const Server = require('./src/infraestructure/express/express-server');
 
 /**
  * Postgresql
  */
-const { createPostgresClient } = require('./infraestructure/db/postgres');
+const { createPostgresClient } = require('./src/infraestructure/db/postgres');
 
 /**
  * Repositories
  */
-const PostgresRepositoryProvider = require('./adapters/repositories/postgres/postgres-repository-provider');
-const PostgresRepositoryMark = require('./adapters/repositories/postgres/postgres-repository-mark');
-const PostgresRepositoryModel = require('./adapters/repositories/postgres/postgres-repository-model');
-const PostgresRepositoryCategory = require('./adapters/repositories/postgres/postgres-repository-category');
-const PostgresRepositoryProduct = require('./adapters/repositories/postgres/postgres-repository-product');
-const PostgresRepositoryQuotation = require('./adapters/repositories/postgres/postgres-respository-quotation');
-const PostgresRepositoryUser = require('./adapters/repositories/postgres/postgres-repository-user');
-const PostgresRepositoryOrder = require('./adapters/repositories/postgres/postgres-repository-order');
+const PostgresRepositoryProvider = require('./src/adapters/repositories/postgres/postgres-repository-provider');
+const PostgresRepositoryMark = require('./src/adapters/repositories/postgres/postgres-repository-mark');
+const PostgresRepositoryModel = require('./src/adapters/repositories/postgres/postgres-repository-model');
+const PostgresRepositoryCategory = require('./src/adapters/repositories/postgres/postgres-repository-category');
+const PostgresRepositoryProduct = require('./src/adapters/repositories/postgres/postgres-repository-product');
+const PostgresRepositoryQuotation = require('./src/adapters/repositories/postgres/postgres-respository-quotation');
+const PostgresRepositoryUser = require('./src/adapters/repositories/postgres/postgres-repository-user');
+const PostgresRepositoryOrder = require('./src/adapters/repositories/postgres/postgres-repository-order');
 
 /**
  * Config Routers
  */
-const ConfigureRouterProvider = require('./adapters/http/provider/http-provider-router');
-const ConfigureRouterMark = require('./adapters/http/mark/http-mark-router');
-const ConfigureRouterModel = require('./adapters/http/model/http-model-router');
-const ConfigureRouterCategory = require('./adapters/http/category/http-category-router');
-const ConfigureRouterProduct = require('./adapters/http/product/http-product-router');
-const ConfigureRouterQuotation = require('./adapters/http/quotation/http-quotation-router');
-const ConfigureRouterUser = require('./adapters/http/user/http-user-router');
-const ConfigureRouterOrder = require('./adapters/http/order/http-order-router');
+const ConfigureRouterProvider = require('./src/adapters/http/provider/http-provider-router');
+const ConfigureRouterMark = require('./src/adapters/http/mark/http-mark-router');
+const ConfigureRouterModel = require('./src/adapters/http/model/http-model-router');
+const ConfigureRouterCategory = require('./src/adapters/http/category/http-category-router');
+const ConfigureRouterProduct = require('./src/adapters/http/product/http-product-router');
+const ConfigureRouterQuotation = require('./src/adapters/http/quotation/http-quotation-router');
+const ConfigureRouterUser = require('./src/adapters/http/user/http-user-router');
+const ConfigureRouterOrder = require('./src/adapters/http/order/http-order-router');
 
 /**
  * UseCases
   */
-const UseCasesProvider = require('./application/usecases/usecases-provider');
-const UseCasesMark = require('./application/usecases/usecases-mark');
-const UseCasesModel = require('./application/usecases/usecases-model');
-const UseCasesCategory = require('./application/usecases/usecases-category');
-const UseCasesProduct = require('./application/usecases/usecases-product');
-const UseCasesQuotation = require('./application/usecases/usecases-quotation');
-const UseCasesUser = require('./application/usecases/usecases-user');
-const UseCasesOrder = require('./application/usecases/usecases-order');
+const UseCasesProvider = require('./src/application/usecases/usecases-provider');
+const UseCasesMark = require('./src/application/usecases/usecases-mark');
+const UseCasesModel = require('./src/application/usecases/usecases-model');
+const UseCasesCategory = require('./src/application/usecases/usecases-category');
+const UseCasesProduct = require('./src/application/usecases/usecases-product');
+const UseCasesQuotation = require('./src/application/usecases/usecases-quotation');
+const UseCasesUser = require('./src/application/usecases/usecases-user');
+const UseCasesOrder = require('./src/application/usecases/usecases-order');
 
 (async () => {
     const postgresClient = await createPostgresClient(

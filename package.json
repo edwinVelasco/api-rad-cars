@@ -2,14 +2,14 @@
     "name": "cf-crud-products",
     "version": "1.0.0",
     "description": "",
-    "main": "src/index.js",
+    "main": "index.js",
     "watch": {
-        "start": "src/index.js"
+        "start": "index.js"
     },
     "scripts": {
         "watch": "npm-watch dev",
-        "dev": "nodemon src/index.js",
-        "start": "node src/index.js"
+        "dev": "nodemon index.js",
+        "start": "node index.js"
     },
     "keywords": [],
     "author": "",

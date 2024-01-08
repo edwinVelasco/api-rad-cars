@@ -18,7 +18,8 @@ class Postgres {
             host: this.host,
             port: this.port,
             dialect: 'postgres',
-            logging: true,
+            dialectModule: require('pg'),
+            logging: false,
             dialectOptions: {
                 ssl: true,
             },
