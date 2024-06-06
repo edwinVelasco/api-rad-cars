@@ -140,11 +140,11 @@ class PostgresRepositoryProducts {
                 }, {});
             }
             // filter products by category, mark and model
-            if (category) options.where['$category.id$'] = { [Op.iLike]: `%${category}%` };
+            if (category) options.where['$category.id$'] = category;
 
-            if (mark) options.where['$mark_model.mark.id$'] = { [Op.iLike]: `%${mark}%` };
+            if (mark) options.where['$mark_model.mark.id$'] = mark;
 
-            if (model) options.where['$mark_model.id$'] = { [Op.iLike]: `%${model}%` };
+            if (model) options.where['$mark_model.id$'] = model;
 
             const result = await this.client.models.products.findAll(options);
             return [{ data: result }, null];
