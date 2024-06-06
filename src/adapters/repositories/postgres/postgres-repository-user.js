@@ -98,14 +98,27 @@ class PostgresRepositoryUser {
     async updateUserRepository(payload, id) {
         try {
             const now = moment().tz('UTC');
+            const updatedPayload = { updated_at: now };
+
+            if (payload.password) {
+                const passwordHash = await encrypt(payload.password);
+                updatedPayload.password = passwordHash;
+            }
+
+            if (payload.cc) updatedPayload.cc = payload.cc;
+            if (payload.name) updatedPayload.name = payload.name;
+            if (payload.phone) updatedPayload.phone = payload.phone;
+            if (payload.email) updatedPayload.email = payload.email;
+            if (payload.role) updatedPayload.role = payload.role;
+            if (payload.address) updatedPayload.address = payload.address;
+
+            // eslint-disable-next-line no-unused-vars
             const result = await this.client.models.users.update(
-                {
-                    ...payload,
-                    updated_at: now,
-                },
+                updatedPayload,
                 { where: { id } },
             );
-            return [result, null, 200];
+            const user = await this.client.models.users.findOne({ where: { id } });
+            return [user, null, 200];
         } catch (error) {
             console.log(`Sequelize error in set users completed: ${error.parent.sqlMessage}`);
 
