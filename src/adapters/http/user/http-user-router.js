@@ -62,7 +62,7 @@ module.exports = class ConfigureRouterProvider {
                 }),
                 check('email').custom(async (email) => {
                     const user = await this.userUseCase.getUserByEmailUseCase(email);
-                    if (!user) throw new Error(`this user email ${email}, not exists...`);
+                    if (user) throw new Error(`this user email ${email}, not exists...`);
                 }),
                 validRequest,
             ],
